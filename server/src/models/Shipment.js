@@ -19,9 +19,9 @@ const shipmentSchema = new mongoose.Schema(
   {
     trackingId: { type: String, required: true, unique: true },
     title: { type: String, required: true, trim: true, maxlength: 120 },
-    origin: { type: String, required: true, trim: true },
-    destination: { type: String, required: true, trim: true },
-    recipient: { type: String, required: true, trim: true },
+    origin: { type: String, required: true, trim: true,maxlength: 200 },
+    destination: { type: String, required: true, trim: true,maxlength: 200 },
+    recipient: { type: String, required: true, trim: true, maxlength: 120 },
     status: { type: String, enum: statusValues, default: STATUSES.CREATED },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     history: { type: [historySchema], default: [] },
