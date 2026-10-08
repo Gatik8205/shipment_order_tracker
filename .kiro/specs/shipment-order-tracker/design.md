@@ -114,17 +114,24 @@ client/
 | GET | /api/shipments | JWT | any | List (scoped by role), filter + paginate |
 | POST | /api/shipments | JWT | any | Create shipment |
 | GET | /api/shipments/:id | JWT | owner or admin | Detail + history |
-| PATCH | /api/shipments/:id | JWT | owner only | Edit while CREATED |
-| POST | /api/shipments/:id/status | JWT | admin, or owner cancelling | Transition status |
+| PATCH | /api/shipments/:id | JWT | owner only | Edit while CREATED; admin and non-owner users get 404 |
+| POST | /api/shipments/:id/status | JWT | admin for all transitions; owner for cancel-while-CREATED only | Transition status |
 
 ### Authorization matrix
 
 | Action | Owner (user) | Other user | Admin |
 |---|---|---|---|
 | GET detail | 200 | 404 | 200 |
-| PATCH edit | 200 if CREATED, else 409 | 404 | 404 |
-| Status: CANCELLED while CREATED | 200 | 404 | 200 |
-| Status: any other transition | 403 | 404 | 200 if valid, else 409 |
+| PATCH edit (Status = CREATED) | 200 | 404 | 404 |
+| PATCH edit (Status ≠ CREATED) | 409 | 404 | 404 |
+| POST /:id/status — cancel while CREATED | 200 | 404 | 200 |
+| POST /:id/status — valid non-cancel transition | 403 | 404 | 200 |
+| POST /:id/status — invalid transition | 403 | 404 | 409 |
+
+Notes:
+- PATCH is owner-only. An Admin attempting to edit a Shipment receives 404, not 403.
+- A non-owner User attempting any status change (`POST /:id/status`) receives 404 (existence not revealed).
+- An owner User attempting a status transition not covered by the cancel-while-CREATED rule receives 403 (resource is visible to the owner, but the specific action is forbidden).
 
 Invalid ObjectId in `:id` returns 404 for every route.
 
@@ -136,6 +143,13 @@ Invalid ObjectId in `:id` returns 404 for every route.
 { "name": "Alice", "email": "alice@example.com", "password": "secret123" }
 // response (201 register, 200 login)
 { "token": "<JWT>", "user": { "id": "...", "name": "Alice", "email": "alice@example.com", "role": "user" } }
+// 409 duplicate email — body is always exactly:
+{ "message": "Email already registered" }
+// This is an accepted user-enumeration trade-off: registration reveals whether an email is taken.
+// Login (POST /api/auth/login) always returns a generic 401 and does not reveal which field was wrong.
+// This trade-off is documented in the README.
+// 422 missing or invalid fields
+{ "message": "Validation failed", "errors": [ { "field": "email", "reason": "Invalid email format" } ] }
 ```
 
 **GET /api/shipments?status=&page=&limit=**
@@ -165,10 +179,13 @@ The list omits the `history` array. Defaults: page 1, limit 20, max 100.
 // request (note optional, max 280)
 { "to": "PICKED_UP", "note": "Collected from warehouse" }
 // 200: full updated Shipment (history populated as above)
+// 422 missing/unrecognised `to` or note > 280 chars: { "message": "Validation failed", "errors": [...] }
 // 409 invalid transition: { "message": "Cannot move from X to Y", "allowed": ["Z"] }
 // 409 race:               { "message": "Shipment was updated by someone else, please retry",
 //                           "allowed": ["Z"] }
 ```
+
+> **Validation note**: a missing or unrecognised `to` value, or a `note` exceeding 280 characters, returns HTTP 422 (not 409). Only a recognised-but-disallowed transition returns 409.
 
 ### Error format
 
@@ -180,7 +197,8 @@ The list omits the `history` array. Defaults: page 1, limit 20, max 100.
 ```
 
 Status codes: 401 unauthenticated, 403 forbidden action on a visible resource, 404 missing
-or not visible, 409 conflict, 422 validation, 429 rate limit, 500 unexpected.
+or not visible, 409 conflict, 422 validation (all validation failures — missing fields,
+type errors, constraint violations — use 422, never 400), 429 rate limit, 500 unexpected.
 
 ---
 
@@ -248,7 +266,9 @@ on read, not stored on the entry.
 
 `"TRK-" + randomBytes(5).toString('hex').toUpperCase()`. Uniqueness is enforced by the unique
 index, not by a prior lookup: on a duplicate-key error (code 11000) on `trackingId`, generate
-a new id and retry, up to 5 attempts, then return 500. This avoids the check-then-insert race.
+a new id and retry, up to **5 total attempts**; if all 5 attempts fail, return HTTP 500 without
+persisting any partial document. This avoids the check-then-insert race entirely — no existence
+check is performed before the insert.
 
 ### 404 versus 403
 
@@ -270,10 +290,15 @@ the map.
 
 ### Seed script
 
-Refuses to run when `NODE_ENV=production`. Builds all users and shipments in memory (including
-a history entry per traversed transition, with increasing timestamps), validates them, deletes
-existing `users` and `shipments`, then calls `insertMany` once per collection. On any error it
-prints the message and exits non-zero. It prints the account credentials on success.
+Refuses to run when `NODE_ENV=production` — prints an explanatory message and exits with a
+non-zero code without touching the database. Builds all User and Shipment documents in memory
+first (including a history entry per traversed transition, with increasing timestamps) and
+validates them before any database write. Deletes existing `users` and `shipments` collections,
+then calls `insertMany` once per collection. No multi-document transactions are used (unavailable
+on a standalone MongoDB). On any validation or insertion error, the script halts, prints the
+error message to stdout, and exits with a non-zero code — no documents from a failed insert
+remain. On success, it prints the name, email, plaintext password, and role of every created
+account to stdout.
 
 ### Centralized error handling
 
