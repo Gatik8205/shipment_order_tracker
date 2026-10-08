@@ -1,0 +1,14 @@
+# Tasks
+- [ ] 1. Scaffold repo (client/server), eslint, prettier, .env.example, README skeleton
+- [ ] 2. Server bootstrap: Express app, db connection, error handler, ApiError
+- [ ] 3. User model + register/login + auth middleware + requireRole
+- [ ] 4. Shipment model, trackingId generator, create/list/get endpoints
+- [ ] 5. transitions.js + unit tests (write tests first)
+- [ ] 6. Status endpoint with atomic, race-safe update
+- [ ] 7. Edit endpoint + ownership rules + pagination/filter
+- [ ] 8. Seed script (1 admin, 2 users, ~12 shipments in mixed states)
+- [ ] 9. Client: api layer, AuthContext, ProtectedRoute
+- [ ] 10. Client: Dashboard, NewShipment, ShipmentDetail + Timeline
+- [ ] 11. Error/loading states, empty states, responsive pass
+- [ ] 12. Review every AI-generated file: fix and commit fixes separately
+- [ ] 13. README (incl. "How I used Kiro"), screenshots, fresh-clone test
