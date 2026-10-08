@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { ApiError } = require('../utils/ApiError');
+const { JWT_SECRET } = require('../config/env');
 
 /**
  * Authentication middleware.
@@ -32,7 +33,7 @@ async function auth(req, res, next) {
     // Verify signature and expiry; throws on any failure
     let payload;
     try {
-      payload = jwt.verify(token, process.env.JWT_SECRET);
+      payload = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
     } catch {
       // jwt.JsonWebTokenError, jwt.TokenExpiredError, jwt.NotBeforeError, etc.
       // Do not include the error message — it may reference token contents.
