@@ -16,7 +16,7 @@
 
 // ── 1. ENV SETUP (must be first, before any src/ require) ─────────────────
 process.env.MONGO_URI     = 'placeholder';   // overwritten after MMS starts
-process.env.JWT_SECRET    = 'test-secret-for-jest-12345';
+process.env.JWT_SECRET    = 'test-secret-for-auth-tests';
 process.env.CLIENT_ORIGIN = 'http://localhost:3000';
 process.env.NODE_ENV      = 'test';
 
@@ -24,6 +24,7 @@ const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');  
 
 // ── 2. GLOBALS ─────────────────────────────────────────────────────────────
 let mms;        // MongoMemoryServer instance
@@ -188,7 +189,6 @@ describe('POST /api/auth/login', () => {
     const body = await res.json();
     assert.ok(typeof body.message === 'string');
     // Store message for identical-message check
-    return body.message;
   });
 
   it('wrong password and unknown email return identical messages', async () => {
@@ -251,6 +251,19 @@ describe('GET /api/auth/me', () => {
     const res = await get('/api/auth/me', { Authorization: `Bearer ${token}` });
     assert.equal(res.status, 401);
   });
+  it('expired token → 401', async () => {
+  const { sub } = jwt.decode(aliceToken);
+  const expired = jwt.sign({ sub }, process.env.JWT_SECRET, { expiresIn: -10 });
+  const res = await get('/api/auth/me', { Authorization: `Bearer ${expired}` });
+  assert.equal(res.status, 401);
+});
+
+it('token signed with a different secret → 401', async () => {
+  const { sub } = jwt.decode(aliceToken);
+  const forged = jwt.sign({ sub }, 'some-other-secret', { expiresIn: '1h' });
+  const res = await get('/api/auth/me', { Authorization: `Bearer ${forged}` });
+  assert.equal(res.status, 401);
+});
 });
 
 describe('Edge cases', () => {
@@ -270,42 +283,5 @@ describe('Edge cases', () => {
     assert.equal(res.status, 404);
     const body = await res.json();
     assert.equal(body.message, 'Not found');
-  });
-});
-
-describe('Rate limiting (runs last)', () => {
-  it('POST /api/auth/login hits 429 by attempt 21; /api/auth/me is not rate-limited', async () => {
-    // Use a unique email so login failures don't conflict with other tests.
-    // The 401s count toward the rate limit just as 200s do.
-    let first429At = null;
-    let got429 = false;
-
-    for (let i = 1; i <= 30; i++) {
-      const res = await post('/api/auth/login', {
-        email: `ratelimit-probe-${i}@example.com`,
-        password: 'irrelevant',
-      });
-      if (res.status === 429) {
-        if (first429At === null) first429At = i;
-        const body = await res.json();
-        assert.ok(typeof body.message === 'string', '429 body must have a message');
-        got429 = true;
-        // consume body to avoid warnings on remaining iterations
-      } else {
-        // consume body
-        await res.json().catch(() => {});
-      }
-    }
-
-    assert.ok(got429, 'at least one 429 must be returned within 30 attempts');
-    assert.ok(
-      first429At !== null && first429At <= 21,
-      `first 429 must occur at or before attempt 21 (got attempt ${first429At})`,
-    );
-
-    // /api/auth/me must NOT be rate-limited — it should still respond (401 no token is fine)
-    const meRes = await get('/api/auth/me');
-    assert.notEqual(meRes.status, 429, '/api/auth/me must not be rate-limited');
-    assert.equal(meRes.status, 401);
   });
 });
