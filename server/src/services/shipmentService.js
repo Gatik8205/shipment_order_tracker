@@ -1,13 +1,6 @@
 const Shipment = require('../models/Shipment');
 const { canTransition, allowedNext } = require('../utils/transitions');
-
-class ApiError extends Error {
-  constructor(status, message, extra = {}) {
-    super(message);
-    this.status = status;
-    Object.assign(this, extra);
-  }
-}
+const { ApiError } = require('../utils/ApiError');
 
 /**
  * Move a shipment to a new status.
