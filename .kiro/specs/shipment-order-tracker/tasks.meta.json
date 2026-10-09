@@ -1,0 +1,41 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "2.4 `src/middleware/errorHandler.js` — uses `ApiError.status` and merges `extra` (`allowed`, `errors`) into the body; unknown errors become 500 with a generic message; includes `stack` only when `NODE_ENV !== 'production'`": [
+      {
+        "executionId": "d6d5e833-63eb-4065-840e-7f7fc6b0e36a",
+        "chatSessionId": "sess_e2a2054f-3f21-4fee-8e5a-13a308ef500e",
+        "timestamp": 1791455878219
+      },
+      {
+        "executionId": "d6d5e833-63eb-4065-840e-7f7fc6b0e36a",
+        "chatSessionId": "sess_e2a2054f-3f21-4fee-8e5a-13a308ef500e",
+        "timestamp": 1791455934868
+      }
+    ],
+    "2.5 `src/middleware/validate.js` — factory `validate(schema, source = 'body')` for `'body' | 'query' | 'params'`; on failure calls `next(new ApiError(422, 'Validation failed', { errors: [{ field, reason }] }))`. A `params` failure for an invalid ObjectId must produce 404, not 422 (add a `validateObjectId` helper)": [
+      {
+        "executionId": "a44b68ba-90ad-43c2-aaab-57c4c0f3c50f",
+        "chatSessionId": "sess_b35cfae3-c82b-4334-b48e-73348114195b",
+        "timestamp": 1791456228451
+      },
+      {
+        "executionId": "a44b68ba-90ad-43c2-aaab-57c4c0f3c50f",
+        "chatSessionId": "sess_b35cfae3-c82b-4334-b48e-73348114195b",
+        "timestamp": 1791456453485
+      }
+    ],
+    "2.6 `src/app.js` — builds and exports the Express app (helmet defaults, cors restricted to `CLIENT_ORIGIN`, JSON body parser, routers, errorHandler) without listening; `server/index.js` connects the DB and calls `app.listen`": [
+      {
+        "executionId": "1c3e05ac-a2c6-44e1-94e3-b33d4403afb5",
+        "chatSessionId": "sess_fc85bee2-074f-43d8-83aa-3bb42b75ec07",
+        "timestamp": 1791456889824
+      },
+      {
+        "executionId": "1c3e05ac-a2c6-44e1-94e3-b33d4403afb5",
+        "chatSessionId": "sess_fc85bee2-074f-43d8-83aa-3bb42b75ec07",
+        "timestamp": 1791457304684
+      }
+    ]
+  }
+}
