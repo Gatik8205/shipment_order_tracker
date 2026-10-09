@@ -40,6 +40,7 @@ function toShipmentDTO(doc) {
     };
   });
 
+  obj.allowed = allowed(obj.status);
   return obj;
 }
 
