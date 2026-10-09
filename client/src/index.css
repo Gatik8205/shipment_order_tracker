@@ -109,3 +109,239 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* ─── ShipmentDetail ──────────────────────────────────────────── */
+
+.detail-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--text);
+}
+
+.detail-error {
+  padding: 2rem;
+  text-align: left;
+  color: #721c24;
+}
+
+.detail-error a {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--accent);
+}
+
+.detail-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.detail-header {
+  margin-bottom: 2rem;
+}
+
+.detail-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  color: var(--text-h);
+}
+
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-tracking {
+  font-size: 0.85rem;
+}
+
+.detail-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+}
+
+.detail-field dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.detail-field dd {
+  margin: 0;
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+}
+
+.detail-section h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  margin: 0 0 0.75rem;
+}
+
+/* ─── Timeline ────────────────────────────────────────────────── */
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+/* Vertical line running through the markers */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--border);
+  border-radius: 1px;
+}
+
+.timeline-entry {
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  position: relative;
+}
+
+.timeline-marker {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--border);
+  margin-top: 2px;
+  z-index: 1;
+}
+
+.timeline-body {
+  flex: 1;
+}
+
+.timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.timeline-time {
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.timeline-actor {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.timeline-note {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  color: var(--text-h);
+  background: var(--code-bg);
+  border-left: 3px solid var(--accent-border);
+  padding: 4px 8px;
+  border-radius: 0 4px 4px 0;
+}
+
+.timeline-empty {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+/* ─── Status-change controls ──────────────────────────────────── */
+
+.detail-change-error {
+  color: #721c24;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.detail-note-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.detail-note-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.detail-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border: 1px solid var(--accent-border);
+  border-radius: 4px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.detail-action-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+
+.detail-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
