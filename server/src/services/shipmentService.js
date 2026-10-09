@@ -225,8 +225,16 @@ async function changeStatus({ shipmentId, to, note, actor }) {
     { new: true }
   );
 
-  if (!updated) throw new ApiError(409, 'Shipment was updated by someone else, please retry');
-  return updated;
+  if (!updated) {
+    const current = await Shipment.findById(shipmentId).lean();
+    const currentStatus = current ? current.status : shipment.status;
+    throw new ApiError(409, 'Shipment was updated by someone else, please retry', {
+      allowed: allowedNext(currentStatus),
+    });
+  }
+
+  await updated.populate('history.actor', 'name');
+  return toShipmentDTO(updated);
 }
 
 module.exports = {
