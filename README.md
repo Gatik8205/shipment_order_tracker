@@ -2,8 +2,6 @@
 
 A small MERN application for creating shipments and tracking them through a validated status lifecycle. Every status change is stored in an append-only history, so each shipment has a full audit trail.
 
-> TODO: add 2-3 screenshots here (dashboard, shipment detail with timeline, admin status buttons).
-
 
 ## Features
 
