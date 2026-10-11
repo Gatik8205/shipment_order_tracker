@@ -125,17 +125,15 @@ Status codes: 401 unauthenticated, 403 forbidden action on a visible resource, 4
 
 ## How I used Kiro
 
-> ## How I used Kiro
-
 I used Kiro's spec-driven workflow (requirements -> design -> tasks) on the free plan,
 which has a 50-credit limit. I planned the credits: Kiro handled the parts with real
-logic, and I did boilerplate and review by hand. [CONFIRM: final credit usage]
+logic, and I did boilerplate and review by hand.
 
 ### Process
 1. **Starting point.** Before opening Kiro, I wrote an initial spec outline and the core
    domain code: the User and Shipment models, the status transition map
    (`utils/transitions.js`), the atomic `changeStatus` service function, and its unit
-   tests. I drafted these with help from Claude (a chat assistant). [CONFIRM]
+   tests. I drafted these with help from Claude (a chat assistant).
 2. **Spec phase.** In Kiro I started a "Build a Feature" spec session, requirements
    first, and gave it my project description and the existing files. Kiro generated 17
    requirements, a design document and a task list. I did not accept them as generated:
@@ -158,7 +156,7 @@ logic, and I did boilerplate and review by hand. [CONFIRM: final credit usage]
 - The React client: API layer, auth context, protected routes, dashboard, shipment detail
   with timeline, login/register and new-shipment forms
 
-### What I wrote or changed by hand
+### What I wrote by hand
 - Project structure (moved server code into `src/`), env and DB config, `package.json`
   scripts, `.env` files
 - The domain core described above (models, transition map, `changeStatus`)
@@ -167,7 +165,7 @@ logic, and I did boilerplate and review by hand. [CONFIRM: final credit usage]
 
 ### Other tools
 I used Claude (chat) as a reviewer and for debugging: to review Kiro's specs and diffs
-and suggest fixes, which I then applied myself. [CONFIRM and reword if you used it differently]
+and suggest fixes, which I then applied myself.
 
 ### Problems found in generated output, and how I fixed them
 [For each item write how YOU found it and add the commit hash. Keep only the ones you
